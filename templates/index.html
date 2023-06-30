@@ -1,0 +1,138 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}Generate VIN{% endblock %}
+{% block content %}
+<div class="jumbotron" xmlns="http://www.w3.org/1999/html">
+	<div class="container">
+  <h1>VIN Generator</h1>
+
+  <form name="form_vin" action="/" method="POST">
+    <label for="version">Version:</label>
+    <input type="text" id="version" name="version" maxlength="3" required>
+    <br>
+
+    <label for="equipment">Equipment Code:</label>
+    <select id="equipment" name="equipment" required>
+      {% for code, name in equipment_options.items() %}
+        <option value="{{ code }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+    <br>
+
+    <label for="year">Year of Issue:</label>
+    <input type="text" id="year" name="year" maxlength="2" required>
+    <br>
+
+    <label for="place">Place of Production:</label>
+    <select id="place" name="place" required>
+      {% for code, name in place_options.items() %}
+        <option value="{{ code }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    <label for="searchButton">Serial Number:</label>
+    <input id="serialNumber" type="text" name="serialNumber" readonly>
+    <button type="button" id="searchButton" disabled>Search</button><br>
+    <button type="submit" id="generateButton" disabled>Generate</button>
+    <button type="button" id="addButton" disabled>Add</button>
+    <br>
+    <a href="{{ url_for('vins') }}">
+    <button type="button" id="allVins">All Vins</button>
+    </a>
+
+
+  {% if vin %}
+    <h2>VIN Number:</h2>
+    <p id="vin">{{ vin }}</p>
+
+  {% endif %}
+
+    </form>
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+  // Function to check if all fields are filled
+  function enableSearchButton() {
+    var version = $('#version').val();
+    var equipment = $('#equipment').val();
+    var year = parseInt($('#year').val());
+    var place = $('#place').val();
+
+    if (version && equipment && year && place) {
+      $('#searchButton').prop('disabled', false);
+    } else {
+      $('#searchButton').prop('disabled', true);
+    }
+
+    var serialNumber = $('#serialNumber').val();
+    }
+
+  // Event listener for field changes
+  $('#version, #equipment, #year, #place').change(function() {
+    enableSearchButton();
+  });
+
+  // Event listener for search button click
+  $('#searchButton').click(function() {
+    var version = $('#version').val();
+    var equipment = $('#equipment').val();
+    var year = parseInt($('#year').val());
+    var place = $('#place').val();
+
+    $.ajax({
+      type: 'POST',
+      url: '/search',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({
+        version: version,
+        equipment: equipment,
+        year: year,
+        place: place
+      }),
+      success: function(response) {
+        $('#serialNumber').val(response.serialNumber);
+        $('#vin').val(response.vin);
+        $('#generateButton').prop('disabled', false);
+        enableSearchButton();
+      },
+      error: function() {
+        alert('Failed to search for serial number');
+      }
+    });
+  });
+
+    // Event listener for add button click
+
+    if (vin) {
+      $('#addButton').prop('disabled', false);
+    } else {
+      $('#addButton').prop('disabled', true);
+    }
+
+  $('#addButton').click(function() {
+    var vin = $('#vin').text();
+
+    $.ajax({
+      type: 'POST',
+      url: '/add',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({
+        vin: vin
+      }),
+      success: function(response) {
+        alert(response.message);
+        $('#vin').text('');
+      },
+      error: function() {
+        alert('Failed to add VIN number');
+      }
+    });
+  });
+});
+
+</script>
+{% endblock %}

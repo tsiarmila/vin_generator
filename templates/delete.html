@@ -1,0 +1,54 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}Delete VIN{% endblock %}
+
+{% block content %}
+<div class="jumbotron" xmlns="http://www.w3.org/1999/html">
+	<div class="container">
+        <h1>Delete VIN</h1>
+
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="post-preview">
+    <form action="{{ url_for('delete') }}" method="post" id="deleteForm">
+          <p>VIN Number: {{ vin }}</p>
+
+        <input hidden="hidden" name="id" value="{{ vin_to_delete.id }}">
+        <button type="submit" onclick="confirmDelete(event)">Delete VIN</button>
+    </form>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Show confirmation dialog
+        if (confirm("Are you sure you want to delete this VIN?")) {
+            // If confirmed, submit the form
+            document.getElementById("deleteForm").submit();
+        } else {
+            // If canceled, do nothing
+        }
+    }
+
+    // Check for success or error messages in the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const successMessage = urlParams.get('success');
+    const errorMessage = urlParams.get('error');
+
+    // Display alert messages if present
+    if (successMessage) {
+        alert(successMessage);
+    }
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}Generate VIN{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron">
+	<div class="container">
+		<div class="row">
+    		<div class="col-sm-12">
+
+
+		<h1>All VIN Numbers</h1>
+			<table id="alter" class="table">
+				<tr>
+					<th>Version</th>
+					<th>Equipment Code</th>
+					<th>Year of Issue</th>
+					<th>Serial Number</th>
+					<th>Place of Production</th>
+					<th></th>
+				</tr>
+			{% for vins in all_vins %}
+				<tr>
+					<td>{{ vins.version }}</td>
+					<td>{{ vins.equipment }}</td>
+					<td>{{ vins.year }}</td>
+					<td>{{ vins.serial_number }}</td>
+					<td>{{ vins.place }}</td>
+					<td><a href="{{ url_for('delete', id=vins.id) }}">
+					<button type="button" id="delete">Delete VIN</button></a></td>
+				</tr>
+			{% endfor %}
+			</table>
+				<a href="{{ url_for('vin_generator') }}">
+				<button type="button" id="add">Add VIN</button></a>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
